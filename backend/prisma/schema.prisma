@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-tenant root entity
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users      User[]
+  workspaces Workspace[]
+
+  @@map("companies")
+}
+
+// User model with role-based access
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(MEMBER)
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  notes        Note[]
+  votes        Vote[]
+  noteHistories NoteHistory[]
+
+  @@index([companyId])
+  @@index([email])
+  @@map("users")
+}
+
+enum UserRole {
+  OWNER
+  MEMBER
+}
+
+// Workspace model for organizing notes
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String
+  description String?
+  companyId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  notes   Note[]
+
+  @@unique([companyId, slug])
+  @@index([companyId])
+  @@index([slug])
+  @@map("workspaces")
+}
+
+// Note model - core content entity
+model Note {
+  id          String     @id @default(cuid())
+  title       String
+  content     String     @db.Text
+  workspaceId String
+  createdBy   String
+  status      NoteStatus @default(DRAFT)
+  type        NoteType   @default(PRIVATE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  workspace Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  tags      NoteTag[]
+  votes     Vote[]
+  histories NoteHistory[]
+
+  // Denormalized counts for scalable sorting
+  upvotes   Int @default(0)
+  downvotes Int @default(0)
+
+  @@index([workspaceId])
+  @@index([createdBy])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@index([title])
+  @@index([upvotes])
+  @@index([downvotes])
+  @@map("notes")
+}
+
+enum NoteStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum NoteType {
+  PUBLIC
+  PRIVATE
+}
+
+// Tag model for categorization
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  notes NoteTag[]
+
+  @@index([slug])
+  @@map("tags")
+}
+
+// Many-to-many relation between Notes and Tags
+model NoteTag {
+  noteId String
+  tagId  String
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([noteId, tagId])
+  @@index([noteId])
+  @@index([tagId])
+  @@map("note_tags")
+}
+
+// Vote model for upvote/downvote system
+model Vote {
+  id        String   @id @default(cuid())
+  noteId    String
+  userId    String
+  type      VoteType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, userId])
+  @@index([noteId])
+  @@index([userId])
+  @@map("votes")
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
+}
+
+// Note history for version tracking
+model NoteHistory {
+  id              String   @id @default(cuid())
+  noteId          String
+  previousTitle   String
+  previousContent String   @db.Text
+  updatedBy       String
+  createdAt       DateTime @default(now())
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [updatedBy], references: [id], onDelete: Cascade)
+
+  @@index([noteId])
+  @@index([createdAt])
+  @@map("note_histories")
+}
