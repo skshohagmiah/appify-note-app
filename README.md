@@ -1,9 +1,11 @@
 # Note-Taking Application
 
-A modern, production-ready note-taking application with multi-tenancy support, built with Next.js, Express, and PostgreSQL. Features real-time collaboration, version history, voting system, and advanced caching.
+A modern note-taking application with multi-tenancy support, built with Next.js, Express, and PostgreSQL. Features real-time collaboration, version history, voting system, and advanced caching.
 
 ![Tech Stack](https://img.shields.io/badge/Stack-Next.js%20%7C%20Express%20%7C%20PostgreSQL%20%7C%20Redis-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
+Video Demo: https://youtu.be/NcDSXYPXCoI
 
 ## 📋 Table of Contents
 
@@ -347,67 +349,3 @@ Optimized indexes on:
 - Status, type, and creation date for filtering
 - Title for search functionality
 
-## 🚢 Deployment
-
-### Production Deployment
-
-1. **Update environment variables**
-   ```bash
-   # Set production values in .env
-   NODE_ENV=production
-   BACKEND_TARGET=production
-   FRONTEND_TARGET=production
-   
-   # Change JWT secrets to secure random values
-   JWT_SECRET=<your-secure-random-string>
-   JWT_REFRESH_SECRET=<your-secure-random-string>
-   
-   # Update database credentials
-   POSTGRES_PASSWORD=<secure-password>
-   ```
-
-2. **Build and run**
-   ```bash
-   docker compose up -d --build
-   ```
-
-3. **Run migrations**
-   ```bash
-   docker compose exec backend npx prisma migrate deploy
-   ```
-
-### Environment Variables
-
-See [.env.example](.env.example) for all available configuration options.
-
-**Critical Production Settings:**
-- Change all `JWT_SECRET` values
-- Use strong `POSTGRES_PASSWORD`
-- Set appropriate `CORS_ORIGIN`
-- Configure `RATE_LIMIT_*` for your traffic
-- Adjust cache TTL values based on your needs
-
-### Scaling Considerations
-
-- **Database**: Use managed PostgreSQL (AWS RDS, Google Cloud SQL)
-- **Redis**: Use managed Redis (AWS ElastiCache, Redis Cloud)
-- **Backend**: Horizontal scaling with load balancer
-- **Frontend**: Deploy to Vercel, Netlify, or CDN
-- **File Storage**: Add S3 or similar for attachments
-
-## 📝 License
-
-MIT License - see LICENSE file for details
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📧 Support
-
-For issues and questions, please open an issue on GitHub.
-
----
-
-Built with ❤️ using Next.js, Express, and PostgreSQL
-# appify-note-app

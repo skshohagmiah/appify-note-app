@@ -17,7 +17,7 @@ export const setupSecurity = (app: Express) => {
 
     // Rate limiting
     const limiter = rateLimit({
-        windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+        windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 1 * 60 * 1000, // 15 minutes
         max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 10000, // Increased for extensive testing
         message: {
             success: false,
@@ -34,7 +34,7 @@ export const setupSecurity = (app: Express) => {
     // Strict rate limiting for auth endpoints
     const authLimiter = rateLimit({
         windowMs: 15 * 60 * 1000, // 15 minutes
-        max: 5, // 5 requests per window
+        max: 100,
         message: {
             success: false,
             message: 'Too many authentication attempts, please try again later',

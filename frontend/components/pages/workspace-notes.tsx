@@ -324,7 +324,11 @@ export function WorkspaceNotes({ workspaceId }: WorkspaceNotesProps) {
         onOpenChange={setCreateModalOpen}
         mode="create"
         workspaceId={workspaceId}
-        onSave={() => refetch()}
+        onSave={() => {
+          setSearchQuery("")
+          setFilterStatus("all")
+          refetch()
+        }}
       />
 
       <NoteEditorModal

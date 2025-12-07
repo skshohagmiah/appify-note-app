@@ -54,6 +54,7 @@ export function WorkspacesList() {
             <FolderPlus className="mr-2 h-4 w-4" />
             Create Workspace
           </Button>
+          <CreateWorkspaceModal open={createOpen} onOpenChange={setCreateOpen} />
         </div>
       </div>
     )

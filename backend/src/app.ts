@@ -11,6 +11,10 @@ dotenv.config()
 
 const app: Express = express()
 
+// Trust proxy is required when running behind a proxy (e.g. Nginx, Docker)
+// to correctly identify the client IP address for rate limiting.
+app.set('trust proxy', 1)
+
 // Security middleware
 setupSecurity(app)
 
